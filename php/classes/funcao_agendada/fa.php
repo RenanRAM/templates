@@ -42,15 +42,15 @@ class Funcao_Agendada{
 		while(($linha = fgets($handle)) !== false && $cont < $offset){
 			$cont++;
 		}
-		if($linha === false) return false;
 		fclose($handle);
+		if($linha === false) return false;
 		$arr = explode(self::SEPARADOR, $linha);
 		$func_nome = $arr[0];
 		$param = $arr[1] !== ""?json_decode($arr[1]):null;
 		return [$func_nome,$param];
 	}
 
-	public function apagar($offset){//apaga a função agendada no $offset, começa em 0
+	public function apagar($offset){//apaga a função agendada no $offset e reduz em 1 o index de cada função depois do apagado, começa em 0
 		$handle = fopen($this->arquivo, "r+");
 		$cont = 0;
 		$origem_pos = 0;
@@ -58,7 +58,7 @@ class Funcao_Agendada{
 			$cont++;
 			$origem_pos = ftell($handle);
 		}
-		while(($linha = fgets($handle))!== false){
+		while(($linha = fgets($handle))!== false){//apaga e desfragmenta
 			$atual_pos = ftell($handle);
 			fseek($handle,$origem_pos);
 			$tam = fwrite($handle, $linha);
@@ -69,12 +69,29 @@ class Funcao_Agendada{
 		fclose($handle);
 		return $status;
 	}
+
+	public function reset(){//apaga toda memória da instância
+		$handle = fopen($this->arquivo, "w");
+		fclose($handle);
+		return;
+	}
+
+	public function tamanho(){//retorna o total de funções agendadas
+		$handle = fopen($this->arquivo, "r");
+		$cont = 0;
+		while(fgets($handle) !== false){
+			$cont++;
+		}
+		fclose($handle);
+		return $cont;
+	}
 }
 
 
 $teste = new Funcao_Agendada(2);
 
 $i = 0;
+echo "<h3>O tamanho atual é ".$teste->tamanho()."</h3>";
 while(($fn = $teste->ler($i)) !== false){
 	print_r($fn);
 	echo "<br/>";
@@ -84,7 +101,7 @@ while(($fn = $teste->ler($i)) !== false){
 if(isset($_GET['agendar'])){
 	$teste->agendar("nada",7);
 }else if(isset($_GET['apagar'])){
-	echo $teste->apagar($i-1);
+	echo $teste->apagar(-1);
 }
 
 
