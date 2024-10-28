@@ -96,17 +96,31 @@ class Funcao_Agendada{
 $teste = new Funcao_Agendada(2);
 
 $i = 1;
+$cont = 0;//contador de segurança
 echo "<h3>O tamanho atual é ".$teste->tamanho()."</h3>";
 while(($fn = $teste->ler($i)) !== false){
-	print_r($fn);
-	echo "<br/>";
-	$i++;
+	//print_r($fn);
+	//echo "<br/>";
+	[$fnome,$fparam] = $fn;
+	if($fnome($fparam)){//executa as funções, se o retorno for true apaga ela (pois deu certo), se for false pula para a próxima
+		$teste->apagar($i);
+		//não devemos fazer $i++ depois de apagar pois este método desloca todas as funções posteriores para traz, renovando a função agendada no offset $i
+	}else{
+		$i++;
+	}
+	$cont++;
+	if($cont > 1000) break;
 }
+
 
 if(isset($_GET['agendar'])){
 	$teste->agendar("nada",7);
 }else if(isset($_GET['apagar'])){
 	echo $teste->apagar($i-1);
+}
+
+function teste($n){
+	return $n >= 10;
 }
 
 
