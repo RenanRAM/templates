@@ -1,17 +1,28 @@
 <?php
+//refazer o buffer para já pegar as linhas pois está quebrando os caracteras multibyte
+
+
 
 //classe para manipular o agendamento de funções em arquivos .txt que estão ligados à instância da classe
 //é possível ler as funções agendadas na memória (e seu parâmetro salvo em json)
 class Funcao_Agendada{
 	private const PREFIX = "fa_mem";
 	private const SEPARADOR = "|><|";
+	const TAMANHO_BUFFER = 8;
 	private $arquivo = "";//caminho para o arquivo de memória desta instância
 
+	private $bufLeitor = "";
+	private $final = false;//true se não há nada mais para ser lido no arquivo
+	private $offsetBufLeitura = 0;//final do buffer
+	private $linhaInicialBuf = null;//linha inicial do buffer, se for null é desconhecida
+	private $inicioQuebrado = false;
+
 	function __construct($mem){//cria ou abre instância de Funcao_Agendada, $mem é o identificador da memória desta instância
-		$this->arquivo = "fa/".self::PREFIX.$mem.".txt";
-		if(!file_exists("fa/")){
+		$this->arquivo = __DIR__."/fa/".self::PREFIX.$mem.".txt";
+		$dir = __DIR__."/fa/";
+		if(!file_exists($dir)){
 			//pasta não existe ainda, criar agora
-			if(!mkdir("fa/")){
+			if(!mkdir($dir)){
 				throw new Exception("Erro ao criar o diretório", 1);
 			}
 		}
@@ -53,6 +64,60 @@ class Funcao_Agendada{
 		return [$func_nome,$param];
 	}
 
+	public function lerBuf($linha){//problemas com o buffer, provavelmente por causa de caracteres multibyte 
+		$offset_inicio = 0;
+		$numero_linha_atual = 0;
+		if($this->bufLeitor === ""){
+			if($this->final === true){
+				//acabou o arquivo
+				return false;
+			}else{
+				$this->encherBufferLeitura(0);
+				if($this->bufLeitor === ""){
+					//arquivo vazio
+					return false;
+				}
+			}
+		}
+		if($this->linhaInicialBuf !== null){
+			if((($linha === $this->linhaInicialBuf) && !$this->inicioQuebrado) || ($linha > $this->linhaInicialBuf)){
+				//não resetar o buffer
+				$offset_inicio = $this->offsetBufLeitura;
+				$numero_linha_atual = $this->linhaInicialBuf;
+			}
+		}
+		
+		$linha_atual = "";
+		$letra = "";
+		do{
+			$char = 0;
+			$tamanho = strlen($this->bufLeitor);
+			while($char < $tamanho){
+				$letra = $this->bufLeitor[$char];
+				if($letra !== "\n"){
+					if($numero_linha_atual === $linha){
+						$linha_atual .= $letra;
+					}
+				}else{
+					$numero_linha_atual++;
+					if($numero_linha_atual > $linha){
+						break 2;
+					}
+				}
+				$char++;
+			}
+			$offset_inicio = $this->offsetBufLeitura+self::TAMANHO_BUFFER+1;
+			$this->encherBufferLeitura($offset_inicio);
+			$this->linhaInicialBuf = $numero_linha_atual;
+			if($letra === "\n"){
+				$this->inicioQuebrado = false;
+			}else{
+				$this->inicioQuebrado = true;
+			}
+		}while(!$this->final);
+		return $linha_atual;	
+	}
+
 	public function apagar($offset){//apaga a função agendada no $offset e reduz em 1 o index de cada função depois do apagado, começa em 1
 		$handle = fopen($this->arquivo, "r+");
 		$cont = 0;
@@ -90,6 +155,23 @@ class Funcao_Agendada{
 		fclose($handle);
 		return $cont;
 	}
+
+	private function encherBufferLeitura($offset = 0){
+		echo "atualizando buffer <br>";
+		$handle = fopen($this->arquivo, "r");
+		fseek($handle,$offset);
+		$this->bufLeitor = fread($handle, self::TAMANHO_BUFFER);
+		$this->offsetBufLeitura = ftell($handle);
+		$this->final = feof($handle);
+		fclose($handle);
+		if($offset === 0){
+			$this->linhaInicialBuf = 0;
+		}else{
+			$this->linhaInicialBuf = null;
+		}
+		echo $this->bufLeitor."<br>";
+		return;
+	}
 }
 
 
@@ -98,6 +180,18 @@ $teste = new Funcao_Agendada(2);
 $i = 1;
 $cont = 0;//contador de segurança
 echo "<h3>O tamanho atual é ".$teste->tamanho()."</h3>";
+
+echo "linha ".$teste->lerBuf(1);
+echo "<br>";
+echo "linha ".$teste->lerBuf(2);
+echo "<br>";
+echo "linha ".$teste->lerBuf(3);
+echo "<br>";
+echo "linha ".$teste->lerBuf(4);
+echo "<br>";
+
+/*
+//todas as funções que retornarem true serão apagadas
 while(($fn = $teste->ler($i)) !== false){
 	//print_r($fn);
 	//echo "<br/>";
@@ -122,6 +216,6 @@ if(isset($_GET['agendar'])){
 function teste($n){
 	return $n >= 10;
 }
-
+*/
 
 ?>

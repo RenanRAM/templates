@@ -11,7 +11,7 @@ function interpretarMask(mask){//funcionando
 		let fim = false;
 		for(let i = 0;i<tam;i++){
 			char = mask.charAt(i);
-			if(isNaN(Number(char)) || (char==' ')){//verifica se o caracter não é um número ou é ' '
+			if(isNaN(Number(char)) || (char===' ')){//verifica se o caracter não é um número ou é ' '
 				//não é um número
 				vetor.push(char);
 			}else{
@@ -21,7 +21,7 @@ function interpretarMask(mask){//funcionando
 				fim = true;//se o laço 'for' acabar naturalmente quer dizer que acabou a string da mascara
 				for(let a = i;a<tam;a++){
 					char_aux = mask.charAt(a);
-					if(isNaN(Number(char_aux))){
+					if(isNaN(Number(char_aux)) || (char_aux===' ')){
 						i = --a;//decrementar 1, pois o atual não é número
 						fim = false;//ainda não acabou a string mask
 						break;
