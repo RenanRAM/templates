@@ -41,6 +41,9 @@
 		private $tipos = [];
 
 		public function __construct(){
+			if(!defined("static::TABELA") || !defined("static::COLUNAS_TIPOS")){
+				throw new Exception("Constantes protected TABELA ou COLUNAS_TIPOS não foram definidas!");
+			}
 			$this->colunas = array_column(static::COLUNAS_TIPOS, 0);
 			$this->tipos = array_column(static::COLUNAS_TIPOS, 1);
 		}
@@ -99,7 +102,7 @@
 	}
 
 	//Funcionamento:
-	//$c1 = new teste1();
+	$c1 = new teste1();
 	//print_r($c1->colunas()); obtendo as colunas
 	//$c1->inserir_rapido(["Renan","teste@hotmail.com",18,"70","Básico","Parcelado"]); inserindo uma linha
 	//base_bd::executaBindSql(null,[],[]); podemos chamar a função separadamente
