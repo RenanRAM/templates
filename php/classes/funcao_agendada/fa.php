@@ -11,12 +11,13 @@ class Funcao_Agendada{
 	const TAMANHO_BUFFER = 8;
 	private $arquivo = "";//caminho para o arquivo de memória desta instância
 
+/*não funcionando
 	private $bufLeitor = "";
 	private $final = false;//true se não há nada mais para ser lido no arquivo
 	private $offsetBufLeitura = 0;//final do buffer
 	private $linhaInicialBuf = null;//linha inicial do buffer, se for null é desconhecida
 	private $inicioQuebrado = false;
-
+*/
 	function __construct($mem){//cria ou abre instância de Funcao_Agendada, $mem é o identificador da memória desta instância
 		$this->arquivo = __DIR__."/fa/".self::PREFIX.$mem.".txt";
 		$dir = __DIR__."/fa/";
@@ -63,7 +64,7 @@ class Funcao_Agendada{
 		$param = $arr[1] !== ""?json_decode($arr[1]):null;
 		return [$func_nome,$param];
 	}
-
+/* não funcionando
 	public function lerBuf($linha){//problemas com o buffer, provavelmente por causa de caracteres multibyte 
 		$offset_inicio = 0;
 		$numero_linha_atual = 0;
@@ -117,7 +118,7 @@ class Funcao_Agendada{
 		}while(!$this->final);
 		return $linha_atual;	
 	}
-
+*/
 	public function apagar($offset){//apaga a função agendada no $offset e reduz em 1 o index de cada função depois do apagado, começa em 1
 		$handle = fopen($this->arquivo, "r+");
 		$cont = 0;
@@ -181,6 +182,7 @@ $i = 1;
 $cont = 0;//contador de segurança
 echo "<h3>O tamanho atual é ".$teste->tamanho()."</h3>";
 
+/* não funcionando
 echo "linha ".$teste->lerBuf(1);
 echo "<br>";
 echo "linha ".$teste->lerBuf(2);
@@ -189,8 +191,9 @@ echo "linha ".$teste->lerBuf(3);
 echo "<br>";
 echo "linha ".$teste->lerBuf(4);
 echo "<br>";
+*/
 
-/*
+
 //todas as funções que retornarem true serão apagadas
 while(($fn = $teste->ler($i)) !== false){
 	//print_r($fn);
@@ -216,6 +219,6 @@ if(isset($_GET['agendar'])){
 function teste($n){
 	return $n >= 10;
 }
-*/
+
 
 ?>
