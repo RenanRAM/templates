@@ -52,3 +52,60 @@
 		return preg_replace(['/[\\\<\>\:\"\/\|\?\*\']/i','/\./'],['','-'], $texto);
 	}
 ?>
+
+<?php
+	//Função para exrtair todas as possibilidade de combinações
+	//segunda versão
+	$pos1 = [
+		[1,2,3,4,5],
+		[77,44,22,11],
+		["A","B"],
+		["hh","jj"]
+	];
+
+	$pos2 = [
+		[1,2,3],["a","b","c"]
+	];
+
+	function gerar($arr){
+		static $pos = [];
+		static $rec = 0;//quantidade de recursões
+		if(count($arr) > 1){
+			$rec++;
+			$pos = gerar(array_slice($arr, 1));
+		}else if($pos === []){
+			foreach ($arr[0] as $value) {
+			 	$pos[] = [$value];
+			}
+			if($rec === 0){
+				$pre = $pos;
+				$pos = [];
+				return $pre;
+			}else{
+				$rec--;
+				return $pos;
+			}
+		}
+		$npos = [];
+		foreach ($arr[0] as $value){
+			foreach ($pos as $valor) {
+				$npos[] = array_merge($valor,[$value]);
+			}	
+		}
+		if($rec === 0){
+			$pos = [];
+		}else{
+			$rec--;
+		}
+		return $npos;
+	}
+	echo "<pre>";
+	print_r(gerar($pos1));
+	echo "</pre>";
+
+
+	echo "<pre>";
+	print_r(gerar($pos2));
+	echo "</pre>";
+
+?>
