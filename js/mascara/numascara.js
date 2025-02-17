@@ -1,10 +1,10 @@
-
-//TODO: fazer método para acrescentar ou setar os aliase
-
 class initnm{
 	static #gabaritosMascaras = {};
-	static #aliases = {mascara2 : '5-4',
-		fone:'(2) 5-4'};
+	static #aliases = {};
+
+	static setAliase(obj){
+		initnm.#aliases = obj;
+	}
 
 	static iniciar(){
 
@@ -25,10 +25,14 @@ class initnm{
 		initnm.#forAliasInputs(ele=>{
 			const mascaraNome = ele.getAttribute("mascara");
 			if(mascaraNome === '') return;
+			//obtendo a máscara crua
 			const masc = initnm.#aliases[mascaraNome];
 			if(masc === '') return;
-			//fazer os gabaritos
-			initnm.#gabaritosMascaras[mascaraNome] = initnm.#interpretarMask(masc);
+			//verificando se já existe um gabarito com esse nome
+			if(!Object.hasOwn(initnm.#gabaritosMascaras,mascaraNome)){
+				//fazer os gabaritos
+				initnm.#gabaritosMascaras[mascaraNome] = initnm.#interpretarMask(masc);
+			}
 			ele.addEventListener('input',()=>{
 				//mudar o valor do input interpretando a mascara
 				const textoInicial = ele.value;
@@ -231,4 +235,3 @@ function carregado(){
 	return false;
 }
 */
-document.addEventListener('DOMContentLoaded', initnm.iniciar);

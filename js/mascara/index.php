@@ -20,13 +20,21 @@
 	<!--Usando 'mascara' precisa ser declarado o objeto "mascaras"(let mascaras={...}) no js, contendo a propriedade com o nome de 'mascara' e seu valor-->
 	<input type="text" placeholder="Fone" mascara="fone">
 
-	<input type="text" placeholder="Fone" mascara="mascara2">
+	<input type="text" placeholder="Fone2" mascara="mascara2">
+	<input type="text" placeholder="Fone2" mascara="mascara2">
+	<input type="text" placeholder="Fone2" mascara="mascara2">
+	<input type="text" placeholder="Fone2" mascara="mascara2">
 </body>
 <script type="text/javascript" src="numascara.js"></script>
+
 <script type="text/javascript">
-	let mascaras = {
+	//exemplo de set de máscaras
+	initnm.setAliase({
 		mascara2 : '5-4',
 		fone:'(2) 5-4'
-	};
+	});
+	//iniciando as máscaras depois do set
+	document.addEventListener('DOMContentLoaded', initnm.iniciar);
 </script>
+
 </html>
